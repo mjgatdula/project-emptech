@@ -1,0 +1,38 @@
+@import "tailwindcss";
+@import "./app.css";
+
+/* T.I.P.-inspired palette: yellow actions, charcoal text, neutral surfaces.
+   Keep dark labels on yellow and use darker gold for text on white. */
+@theme {
+  --font-sans: "Poppins", Arial, sans-serif;
+
+  --color-brand-50: #fffbed;
+  --color-brand-100: #fff3c4;
+  --color-brand-200: #ffe582;
+  --color-brand-300: #ffda57;
+  --color-brand-500: #8a6500;
+  --color-brand-600: #ffcc00;
+  --color-brand-700: #e8b900;
+  --color-brand-800: #705300;
+  --color-brand-900: #3f330c;
+
+  --color-slate-50: #fafafa;
+  --color-slate-100: #f0f0f0;
+  --color-slate-200: #e3e3e3;
+  --color-slate-300: #cdcdcd;
+  --color-slate-400: #737373;
+  --color-slate-500: #666666;
+  --color-slate-600: #535353;
+  --color-slate-700: #404040;
+  --color-slate-800: #303030;
+  --color-slate-900: #262626;
+}
+
+@layer components {
+  .field { @apply mt-2 block w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100 disabled:bg-slate-100; }
+  .btn-primary { @apply inline-flex items-center justify-center gap-2 rounded-xl bg-brand-600 px-5 py-3 text-sm font-semibold text-slate-900 transition hover:bg-brand-700 disabled:cursor-wait disabled:opacity-50; }
+  .btn-secondary { @apply inline-flex items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-default disabled:opacity-40; }
+  .panel { @apply rounded-2xl border border-slate-200 bg-white p-5 sm:p-7; }
+  .label { @apply block text-sm font-semibold text-slate-700; }
+}
+
