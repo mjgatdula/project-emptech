@@ -1,4 +1,17 @@
-.tools/
+
+.env
+.env.*
+!.env.example
+venv/
+.venv/
 node_modules/
 __pycache__/
-test-results/
+*.py[cod]
+*.sqlite3
+frontend/dist/
+backend/staticfiles/
+backend/media/
+backend/private_media/
+
+# Existing local-only credentials; production uses environment-only settings.
+backend/backend/settings.py

@@ -1,0 +1,47 @@
+# Import as a Blueprint from a PRIVATE, secret-free Git repository.
+# No Render database or paid disk is created; Aiven and private object storage persist data.
+services:
+  - type: web
+    name: tipped-campus
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    dockerCommand: python render_start.py
+    healthCheckPath: /api/health/ready/
+    autoDeployTrigger: 'off'
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: backend.production_settings
+      - key: PRIVATE_STORAGE_BACKEND
+        value: s3
+      - key: ALLOW_PASSWORD_AUTH
+        value: 'false'
+      - key: DJANGO_SECRET_KEY
+        sync: false
+      - key: JWT_SIGNING_KEY
+        sync: false
+      - key: GOOGLE_CLIENT_ID
+        value: 117583489985-mogcbg4lo07a3n3r7rof6qth2durdaeg.apps.googleusercontent.com
+      - key: DB_HOST
+        sync: false
+      - key: DB_PORT
+        sync: false
+      - key: DB_NAME
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: DB_SSLMODE
+        value: require
+      - key: PRIVATE_STORAGE_ENDPOINT
+        sync: false
+      - key: PRIVATE_STORAGE_REGION
+        sync: false
+      - key: PRIVATE_STORAGE_BUCKET
+        value: tipped-private
+      - key: PRIVATE_STORAGE_ACCESS_KEY
+        sync: false
+      - key: PRIVATE_STORAGE_SECRET_KEY
+        sync: false
