@@ -7,8 +7,9 @@ import PageHeading from '../components/common/PageHeading'
 import Feedback from '../components/common/Feedback'
 import Pagination from '../components/common/Pagination'
 import Loading from '../components/Loading'
+import ExternalInvitations from '../components/ExternalInvitations'
 
-const roleLabels = { superadmin: 'Super Admin', admin: 'Administrator', osa: 'OSA', student: 'Student' }
+const roleLabels = { superadmin: 'Super Admin', admin: 'Administrator', osa: 'OSA', student: 'Student', guest: 'External user' }
 
 function UserPermissions({ user, viewer, sites, onSave }) {
   const [busy, setBusy] = useState(false)
@@ -45,7 +46,7 @@ function UserPermissions({ user, viewer, sites, onSave }) {
           <summary>{viewer.isSuperuser ? 'Edit account and role permissions' : 'Review ordinary account'}</summary>
           <div className="space-y-5 pt-4">
             <label className="flex gap-2 text-sm"><input name="active" type="checkbox" defaultChecked={user.isActive} />Active account</label>
-            {viewer.isSuperuser && <>
+            {viewer.isSuperuser && !user.isExternal && <>
               <fieldset className="space-y-3">
                 <legend className="text-sm font-semibold">Application roles</legend>
                 <label className="flex gap-2 text-sm"><input name="admin" type="checkbox" defaultChecked={user.roles.includes('admin')} />Administrator: ordinary accounts and catalogue</label>
@@ -141,6 +142,7 @@ export default function Administration() {
         </div>
       ))}
       {section === 'accounts' && <section>
+        {user.isSuperuser && <div className="mb-8"><ExternalInvitations /></div>}
         <h2 className="text-2xl font-bold">{user.isSuperuser ? 'Accounts & role assignments' : 'Ordinary accounts & identity review'}</h2>
         <form className="my-5 flex gap-3" onSubmit={event => { event.preventDefault(); setQuery(new FormData(event.currentTarget).get('q')); setPage(1) }}><label className="flex-1"><span className="sr-only">Search accounts</span><input className="field" name="q" placeholder="Search username or email" /></label><button className="btn-secondary self-end">Search</button></form>
         <Feedback error={users.error} />

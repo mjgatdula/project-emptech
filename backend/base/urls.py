@@ -1,5 +1,5 @@
 from django.urls import path
-from . import api, views, google_auth, health
+from . import api, views, google_auth, health, external_access
 
 urlpatterns = [
     path('', views.api_root, name='api-root'),
@@ -33,4 +33,5 @@ urlpatterns = [
     path('staff/export/', views.export_reports, name='api-export'),
     path('staff/configuration/', views.configuration, name='api-configuration'),
     path('staff/users/', views.staff_users, name='api-staff-users'),
+    path('staff/external-access/', external_access.invitations, name='api-external-access'),
 ]

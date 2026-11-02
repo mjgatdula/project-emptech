@@ -70,7 +70,7 @@ export default function Register() {
       <p className="account-side-note">A misplaced essential. A thoughtful finder. Be part of the way back.</p></div><div className="account-form">
         <div className="account-form-note flex items-start gap-3">
           <LuLockKeyhole aria-hidden="true" className="mt-1 h-4 w-4 shrink-0 text-brand-800" />
-          <p id="register-preview-note" className="text-xs leading-6 text-slate-600"><strong className="text-slate-900">Create your account.</strong> {configuration.data?.passwordAuthEnabled ? 'All fields are required. You can add student details later in your profile.' : 'Your verified school Google account creates your TIPPED account. Add student details later in Profile.'}</p>
+          <p id="register-preview-note" className="text-xs leading-6 text-slate-600"><strong className="text-slate-900">Create your account.</strong> {configuration.data?.passwordAuthEnabled ? 'All fields are required. You can add student details later in your profile.' : 'TIP Google accounts can register directly. External Google accounts need Super Admin approval before signing in.'}</p>
         </div>
         <GoogleSignIn configuration={configuration} next={next} />
         {configuration.data?.passwordAuthEnabled && <form onSubmit={handleSubmit} onInput={() => { setError(null); setMessage('') }} aria-describedby="register-preview-note" className="space-y-5" aria-busy={submitting}><fieldset disabled={submitting} className="min-w-0 space-y-5">

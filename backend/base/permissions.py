@@ -31,7 +31,10 @@ def account_roles(user):
         roles.append('admin')
     if OSA_GROUP in role_groups(user):
         roles.append('osa')
-    return roles or ['student']
+    if roles:
+        return roles
+    from .deployment_policy import SCHOOL_DOMAIN
+    return ['student'] if user.email.casefold().split('@')[-1] == SCHOOL_DOMAIN else ['guest']
 
 
 def is_privileged_account(user):

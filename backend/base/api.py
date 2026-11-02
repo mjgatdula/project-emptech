@@ -27,6 +27,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import STUDENT_PROFILE, GOOGLE_IDENTITY
 from .deployment_policy import RESERVED_EMAILS
+from .access_policy import is_school_email
 from .permissions import is_administrator, is_osa, account_roles
 
 
@@ -87,6 +88,7 @@ def user_data(user):
         'roles': account_roles(user), 'role': account_roles(user)[0],
         'studentProfile': student_data(user),
         'googleLinked': GOOGLE_IDENTITY.objects.filter(user=user).exists(),
+        'isExternal': not is_school_email(user.email),
     }
 
 

@@ -35,6 +35,26 @@ def private_evidence_storage():
     )
 
 
+def external_access_expiry():
+    from datetime import timedelta
+    return timezone.now() + timedelta(days=30)
+
+
+class EXTERNAL_ACCESS(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    email = models.EmailField(max_length=254, unique=True)
+    invited_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL, related_name='external_invitations_created')
+    accepted_user = models.OneToOneField(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name='external_access')
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(default=timezone.now)
+    expires_at = models.DateTimeField(default=external_access_expiry)
+    accepted_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ['-created_at', 'id']
+        constraints = [models.UniqueConstraint(models.functions.Lower('email'), name='external_email_case_insensitive')]
+
+
 class GOOGLE_IDENTITY(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, primary_key=True, on_delete=models.CASCADE, related_name='google_identity')
     subject = models.CharField(max_length=255, unique=True)

@@ -25,6 +25,7 @@ from .permissions import (can_manage, require_manager, staff_sites, IsCampusStaf
 from .services import reports_query, public_reports, managed_reports, event, notify, editable, private_upload_scope, visible_notifications
 from .serializers import ReportSerializer, ReportWriteSerializer, ClaimWriteSerializer
 from .api import user_data
+from .access_policy import is_school_email
 
 
 class Response(DRFResponse):
@@ -477,6 +478,8 @@ def account(request):
         if not name or len(name) > 150:
             raise ValidationError('Enter your full name within 150 characters.')
         identity = request.data.get('studentNumber')
+        if identity is not None and not is_school_email(user.email):
+            raise PermissionDenied('Student identity details are reserved for school accounts.')
         with transaction.atomic():
             get_user_model().objects.select_for_update().get(pk=user.pk)
             first, _, last = name.partition(' ')
@@ -578,6 +581,8 @@ def staff_users(request):
                     ids = set()
                 else:
                     ids = set(user.staff_site_assignments.filter(is_active=True).values_list('site_id', flat=True))
+                if not is_school_email(user.email) and (admin_role or osa_role or ids):
+                    raise PermissionDenied('External accounts cannot receive staff roles or campus assignments.')
                 if 'isAdmin' in request.data or 'isOsa' in request.data:
                     for name, enabled in [(ADMIN_GROUP, admin_role), (OSA_GROUP, osa_role)]:
                         group, _ = Group.objects.get_or_create(name=name)

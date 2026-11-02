@@ -32,7 +32,7 @@ export default function GoogleSignIn({ configuration, next = '', link = false })
     const originalPath = window.location.pathname
     Promise.all([loadSdk(), apiRequest('/auth/google/challenge/', { auth: false })]).then(([google, challenge]) => {
       if (!active) return
-      google.initialize({client_id: clientId, nonce: challenge.nonce, hd: 'tip.edu.ph', auto_select: false,
+      google.initialize({client_id: clientId, nonce: challenge.nonce, auto_select: false,
         callback: async ({ credential }) => {
           if (!active || pending.current) return
           pending.current = true; setBusy(true); setError('')
@@ -53,8 +53,8 @@ export default function GoogleSignIn({ configuration, next = '', link = false })
   if (configuration.loading) return <Loading inline label="Loading sign-in options..." />
   if (configuration.error) return <><Feedback error={configuration.error} /><button className="btn-secondary" onClick={configuration.retry}>Retry sign-in options</button></>
   if (!clientId) return <p className="mb-5 text-sm text-slate-600">Google sign-in is not available yet. Contact the site administrator.</p>
-  return <section className="mb-6 space-y-3" aria-label={link ? 'Link school Google account' : 'School Google sign-in'} aria-busy={busy}>
-    <p className="text-center text-sm leading-6">{link ? 'Link your verified school Google account.' : 'Continue with your verified @tip.edu.ph Google account.'}</p>
+  return <section className="mb-6 space-y-3" aria-label={link ? 'Link approved Google account' : 'Google sign-in'} aria-busy={busy}>
+    <p className="text-center text-sm leading-6">{link ? 'Link your approved Google account.' : 'Continue with your @tip.edu.ph account or an invited external Google account.'}</p>
     <div ref={target} className={`flex min-w-0 justify-center ${busy ? 'pointer-events-none opacity-50' : ''}`} inert={busy || undefined} />
     {busy && <Loading inline label="Verifying Google sign-in..." />}<Feedback error={error} />
     {error && <button className="btn-secondary" onClick={() => {setError('');setRevision(v=>v+1)}}>Retry Google sign-in</button>}

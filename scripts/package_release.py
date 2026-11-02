@@ -11,7 +11,7 @@ files += [ROOT / 'backend' / name for name in ['manage.py', 'render_start.py', '
 files += [p for folder in ['frontend/src', 'frontend/public'] for p in (ROOT / folder).rglob('*') if p.is_file() and p.suffix.lower() in {'.js', '.jsx', '.css', '.svg', '.png', '.jpg', '.jpeg', '.webp', '.ico', '.woff', '.woff2', '.ttf'}]
 files += [ROOT / 'frontend' / name for name in ['package.json', 'package-lock.json', 'vite.config.js', 'eslint.config.js', 'index.html']]
 files += [p for p in (ROOT / 'scripts').glob('*') if p.suffix in {'.ps1', '.py'}]
-files += [ROOT / 'docs' / name for name in ['FREE_HOSTING_ROLLOUT.md', 'GOOGLE_SIGN_IN_DEPLOYMENT.md', 'DEPLOYMENT.md']]
+files += [ROOT / 'docs' / name for name in ['FREE_HOSTING_ROLLOUT.md', 'GOOGLE_SIGN_IN_DEPLOYMENT.md', 'DEPLOYMENT.md', 'EXTERNAL_ACCESS.md']]
 target = ROOT / 'artifacts/tipped-docker-release.zip'
 target.parent.mkdir(exist_ok=True)
 with zipfile.ZipFile(target, 'w', zipfile.ZIP_DEFLATED) as output:

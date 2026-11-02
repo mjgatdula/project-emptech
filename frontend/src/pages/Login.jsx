@@ -56,7 +56,7 @@ export default function Login() {
       <p className="account-side-note">Looking for an item? The campus board is open to everyone. You only need an account to report or claim.</p></div><div className="account-form">
         <div className="account-form-note flex items-start gap-3">
           <LuLockKeyhole aria-hidden="true" className="mt-1 h-4 w-4 shrink-0 text-brand-800" />
-          <p id="login-preview-note" className="text-xs leading-6 text-slate-600"><strong className="text-slate-900">Sign in to TIPPED.</strong> {configuration.data?.passwordAuthEnabled ? 'Use Google or your existing email/username and password.' : 'Use your verified school Google account.'}</p>
+          <p id="login-preview-note" className="text-xs leading-6 text-slate-600"><strong className="text-slate-900">Sign in to TIPPED.</strong> {configuration.data?.passwordAuthEnabled ? 'Use Google or your existing email/username and password.' : 'Use your TIP Google account or an approved external Google account.'}</p>
         </div>
         <GoogleSignIn configuration={configuration} next={next} />
         {configuration.data?.passwordAuthEnabled && <form onSubmit={handleSubmit} onInput={() => { setMessage(''); setError('') }} aria-describedby="login-preview-note" className="space-y-5" aria-busy={submitting}><fieldset disabled={submitting} className="min-w-0 space-y-5">

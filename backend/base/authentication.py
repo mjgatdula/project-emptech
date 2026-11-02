@@ -3,7 +3,7 @@ from django.conf import settings
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from .models import GOOGLE_IDENTITY
-from .deployment_policy import SCHOOL_DOMAIN
+from .access_policy import is_school_email, external_access_allowed
 
 
 class SchoolJWTAuthentication(JWTAuthentication):
@@ -11,6 +11,7 @@ class SchoolJWTAuthentication(JWTAuthentication):
         user = super().get_user(validated_token)
         if not getattr(settings, 'ALLOW_PASSWORD_AUTH', True):
             email = user.email.casefold()
-            if not email.endswith('@'+SCHOOL_DOMAIN) or not GOOGLE_IDENTITY.objects.filter(user=user, verified_email=email).exists():
-                raise AuthenticationFailed('Sign in with your verified school Google account.', code='google_required')
+            if (not GOOGLE_IDENTITY.objects.filter(user=user, verified_email=email).exists()
+                or (not is_school_email(email) and not external_access_allowed(user))):
+                raise AuthenticationFailed('Sign in with a verified TIP account or an active approved external Google account.', code='google_required')
         return user
