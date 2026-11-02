@@ -1,3 +1,7 @@
+# Current external-account policy
+
+External Google users now register directly without Super Admin approval. See [EXTERNAL_ACCESS.md](EXTERNAL_ACCESS.md); this supersedes previous invitation requirements. No new environment or schema changes are needed.
+
 # Free hosting rollout — current status and operator steps
 
 Updated 2 November 2026. Owner approved Render Free + Supabase Free PRIVATE object storage; Aiven remains the application database. OSA email/campus assignments are pending. No paid plan, billing, external repository publication or public deployment has been activated by the agent.

@@ -33,7 +33,6 @@
 .home-trust-note > svg { width: 22px; height: 22px; flex-shrink: 0; color: var(--color-brand-600); margin-top: 2px; }
 .home-trust-note strong { display: block; font-size: 12px; }
 .home-trust-note span { display: block; color: var(--color-slate-300); margin-top: 3px; }
-.home-photo-credit { display: block; color: var(--color-slate-300); font-size: 10px; line-height: 1.8; margin: 12px 4px 0; text-decoration: underline; text-underline-offset: 3px; }
 .home-belonging { display: flex; align-items: center; gap: 24px; padding-block: 32px; border-bottom: 1px solid var(--app-line); }
 .home-care-icon { display: grid; place-items: center; width: 56px; height: 56px; border-radius: 14px; flex-shrink: 0; background: var(--color-brand-100); color: var(--color-brand-800); }
 .home-care-icon svg { width: 27px; height: 27px; }
@@ -114,7 +113,7 @@
 .home-experience, .home-belonging, .home-recent, .home-campus-frame, .home-board-empty { background: white; color: var(--app-ink); }
 .home-introduction > .home-eyebrow { color: var(--color-brand-800); }
 .home-title > span { color: var(--app-ink); text-decoration: underline; text-decoration-color: var(--color-brand-600); text-decoration-thickness: .1em; text-underline-offset: .12em; }
-.home-intro-note, .home-campus-caption span, .home-trust-note span, .home-photo-credit { color: var(--app-muted); }
+.home-intro-note, .home-campus-caption span, .home-trust-note span { color: var(--app-muted); }
 .home-action-secondary { color: var(--app-ink); background: white; border-color: #b9bec6; }
 .home-action-secondary:hover { background: white; border-color: var(--color-brand-500); }
 .home-search { border-color: #b9bec6; }

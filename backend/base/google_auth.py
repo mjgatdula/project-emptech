@@ -16,7 +16,7 @@ from django.views.decorators.http import require_GET, require_POST
 from jwt.exceptions import PyJWKClientConnectionError, PyJWKClientError, PyJWTError
 from .api import api_errors, body, token_data, AccountThrottle
 from .deployment_policy import SCHOOL_DOMAIN, INITIAL_SUPERADMIN, INITIAL_ADMINS
-from .models import GOOGLE_IDENTITY, AUDIT_EVENT, EXTERNAL_ACCESS
+from .models import GOOGLE_IDENTITY, AUDIT_EVENT
 from .access_policy import is_school_email
 from .permissions import is_privileged_account
 from django.core.validators import validate_email
@@ -35,7 +35,7 @@ keys = jwt.PyJWKClient('https://www.googleapis.com/oauth2/v3/certs', timeout=5, 
 @require_GET
 def configuration(request):
     return JsonResponse({'googleClientId': getattr(settings, 'GOOGLE_CLIENT_ID', ''),
-        'schoolDomain': SCHOOL_DOMAIN, 'passwordAuthEnabled': getattr(settings, 'ALLOW_PASSWORD_AUTH', True), 'externalInvitationsEnabled': True})
+        'schoolDomain': SCHOOL_DOMAIN, 'passwordAuthEnabled': getattr(settings, 'ALLOW_PASSWORD_AUTH', True), 'externalInvitationsEnabled': False, 'externalRegistrationEnabled': True})
 
 
 @never_cache
@@ -108,7 +108,7 @@ def sign_in(request):
     except PyJWKClientConnectionError:
         return JsonResponse({'message': 'Google verification is temporarily unavailable. Try again later.'}, status=503)
     except (PyJWTError, PyJWKClientError, ValueError, TypeError):
-        return JsonResponse({'message': 'Use a verified TIP, Gmail, or Google Workspace account. External users also need Super Admin approval.'}, status=401)
+        return JsonResponse({'message': 'Use a valid, verified Gmail or Google Workspace account. Please try signing in again.'}, status=401)
     try:
         with transaction.atomic():
             # Verify and consume against the locked database session, not a stale tab copy.
@@ -131,12 +131,6 @@ def sign_in(request):
                 for lock_id in lock_ids:
                     cursor.execute('SELECT pg_advisory_xact_lock(%s)', [lock_id])
             external = not is_school_email(email)
-            invitation = None
-            if external:
-                invitation = EXTERNAL_ACCESS.objects.select_for_update().filter(
-                    email=email, is_active=True, expires_at__gt=timezone.now()).first()
-                if invitation is None:
-                    return JsonResponse({'message': 'External accounts require an active Super Admin invitation for this exact email.'}, status=403)
             User = get_user_model()
             identity = GOOGLE_IDENTITY.objects.select_related('user').filter(subject=claims['sub']).first()
             created = False
@@ -173,13 +167,6 @@ def sign_in(request):
             if external:
                 if is_privileged_account(user):
                     raise IdentityConflict('External accounts cannot hold Admin, OSA or Super Admin privileges.')
-                if invitation.accepted_user_id not in (None, user.pk):
-                    raise IdentityConflict('This invitation belongs to another verified identity. Contact the owner.')
-                if invitation.accepted_user_id is None:
-                    invitation.accepted_user = user
-                    invitation.accepted_at = timezone.now()
-                    invitation.save(update_fields=['accepted_user', 'accepted_at'])
-                    AUDIT_EVENT.objects.create(actor=user, action='external_access_accepted', detail=f'External approval {invitation.pk} accepted.')
             if created:
                 # Bootstrap only once, from server-verified identity. Later removals stay removed.
                 if email == INITIAL_SUPERADMIN:
@@ -188,7 +175,7 @@ def sign_in(request):
                 elif email in INITIAL_ADMINS:
                     group, _ = Group.objects.get_or_create(name=ADMIN_GROUP)
                     user.groups.add(group)
-                AUDIT_EVENT.objects.create(actor=user, action='google_identity_linked', detail='Verified Google identity; TIP role policy or ordinary external invitation applied.')
+                AUDIT_EVENT.objects.create(actor=user, action='google_identity_linked', detail='Verified Google identity; TIP role policy or ordinary external registration applied.')
             result = token_data(request, user)
             request.session['google_nonces'] = nonces
             if user.is_superuser:

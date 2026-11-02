@@ -13,5 +13,5 @@ class SchoolJWTAuthentication(JWTAuthentication):
             email = user.email.casefold()
             if (not GOOGLE_IDENTITY.objects.filter(user=user, verified_email=email).exists()
                 or (not is_school_email(email) and not external_access_allowed(user))):
-                raise AuthenticationFailed('Sign in with a verified TIP account or an active approved external Google account.', code='google_required')
+                raise AuthenticationFailed('Sign in with a verified Google account. External accounts must remain ordinary users.', code='google_required')
         return user

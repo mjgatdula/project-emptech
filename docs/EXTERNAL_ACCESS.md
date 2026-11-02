@@ -1,35 +1,25 @@
-# TIP and invited external Google accounts
+# Direct Google registration — current policy
 
-Implemented 2 November 2026. The source update is prepared; it must be committed to GitHub and manually deployed to Render before the live UI changes. Additive migration 0008_external_access is already applied to the existing Aiven database. Existing records and accounts were preserved. No real invitation, external test account or staff assignment was created.
+Updated 2 November 2026. The owner revised the policy: TIP and external Gmail/Google Workspace accounts register and log in DIRECTLY. Super Admin approval is NOT required. This document supersedes the earlier invitation workflow.
 
-## Policy and operation
+## Behavior
 
-Verified tip.edu.ph Google Workspace accounts can continue registering directly. Other users need an explicit active, unexpired approval for their exact email, created by the Super Admin. Supported external identities are Gmail or Google Workspace accounts for which Google is authoritative over the email. A non-Gmail third-party Google identity without the matching Workspace hosted-domain claim is rejected; a stale email_verified flag alone is not treated as current email ownership.
+The existing Google button creates an ordinary account after validating Google's signature, issuer, audience, authorized party, expiry, nonce and verified email. Google must be authoritative for the email (Gmail or a matching Workspace hosted domain). TIP accounts still require the tip.edu.ph Workspace claim. No client privilege fields are trusted. Password registration remains disabled in production.
 
-In the live app after deployment: Super Admin signs in → Profile → Administration → Accounts & permissions → External Google accounts. Enter the exact external email and access duration (1–365 days; default 30), then Approve or renew external email. The person then uses the existing Google button on Login/Register. No email is sent automatically and no password is created. The owner should notify the recipient directly. Google consent/audience or an organization's own Google policy may independently restrict sign-in.
+TIP users retain school roles and the approved initial staff roster. External users are ordinary guest/External user accounts: they can use existing ordinary report/claim flows but cannot access staff administration, OSA operations or unrelated private evidence. They cannot submit school student identity details or receive staff roles/campus assignments. No invitation, invitation email, approval expiry, new secret or Google-origin change is required.
 
-External users are labelled guest/External user. They have existing ordinary report/claim capabilities: public reports and their own permitted records, not other users' private evidence or staff workflows. External users cannot create a school student profile or receive Administrator/OSA roles/campus assignments. They are not a separate invented staff identity. School staff provisioning remains exactly the approved TIP policy.
+Super Admin can manage account activation through existing Accounts & permissions. Deactivating an external account blocks login, access tokens and refresh. Existing email-only accounts are never silently merged with a Google identity; conflicts still require ownership review.
 
-Approval binds to the verified application user on first acceptance. Google identity remains bound by immutable subject; existing email-only accounts are never silently merged. An existing conflicting account requires owner review, not an automatic takeover. A revoked or expired approval blocks subsequent Google login, JWT-authenticated requests and refreshes. Revoke access in the same Super Admin panel. Renewal reactivates the same approval and preserves its accepted-user binding; an inactive application account still cannot log in. All approval/acceptance/revocation actions create audit events.
+## Retired invitation workflow
 
-## API and schema
-
-GET /api/staff/external-access/: paginated results/count/page/pages/hasNext/hasPrevious; each result contains id, email, isActive, expiresAt, accepted, canSignIn. Super Admin only.
-
-POST same endpoint: JSON email and optional days (default 30, range 1–365); creates or renews approval and returns 201 with message. TIP emails are rejected because they need no invitation. Case-normalized email and database/advisory locking prevent duplicate/racing identities. Approval alone never creates a User or privileges.
-
-PATCH same endpoint: JSON id; revokes approval, returns message. There is no hard deletion or arbitrary account-role input.
-
-The auth/config response additionally reports externalInvitationsEnabled. User responses additionally report isExternal and use guest as the ordinary external role. Existing isAdmin/isOsa/isSuperuser flags remain authoritative. Google signature, issuer, audience, azp, expiry, email verification, session-bound nonce and replay checks remain active. The frontend hosted-domain suggestion was removed so invited external people can select their Google account; backend eligibility remains enforced.
-
-EXTERNAL_ACCESS: UUID primary key; unique case-insensitive email; nullable invited_by User FK; nullable accepted_user User one-to-one; is_active; created_at; expires_at; accepted_at. This is an additive authentication-policy table, not a replacement for Google identity or the lost/found ERD. Shared eligibility lives in access_policy.py with no HTTP/view imports. Revocation/privilege eligibility uses one query to avoid repeated remote database round trips.
+The approval panel is removed from Administration. Existing EXTERNAL_ACCESS records, audit history and applied migration 0008 remain preserved. They no longer gate registration or token use. The old Super-Admin-only endpoint permits historical GET reads but returns HTTP 410 for POST/PATCH. Old invitation revocation/expiry does not disable a public-registration account; use account activation instead. The old unmounted ExternalInvitations component is not included in the active UI bundle. No destructive schema migration was performed.
 
 ## Verification
 
-40 signed-Google/JWT/invitation/authorization checks passed, plus 6 optimized-policy query/revocation/privilege checks. They covered TIP login, invited Gmail/Workspace login, uninvited/unverified/unsupported identity rejection, forged privilege input, student/staff boundaries, approval renewal, expiry, revocation and refresh denial. Locally generated RSA signatures were actually validated against an isolated verification key; no real Google identity was impersonated. All test fixture writes were rolled back. Full frontend lint/build, Django checks and migration drift check passed. No retained test files were added to the project. Manual external login on the live host is pending source deployment and an actual owner-issued approval; no claim of zero bugs or completed penetration testing is made.
+24 focused signed-Google/JWT/authorization checks passed: Gmail registration without any approval, external Workspace registration, TIP registration, ordinary roles, ignored privilege injection, valid access/refresh, inactive account denial, no email-only takeover, no external staff promotion, and retired invitation writes. Fixture writes were rolled back; no real external account was created. Full frontend lint/build and Django configuration/migration drift checks passed. Actual Google login on the live site remains to be verified after deploying the updated source. These checks are not a penetration-test certification.
 
-## Upload and deployment
+## Deploy the small update
 
-Use artifacts/tipped-external-access-update.zip for a small update (20 files, below the GitHub web upload limit). Extract it into a fresh folder and drag its backend, frontend, docs and scripts folders together into GitHub Upload files at the repository root. Do not upload the parent folder or the ZIP itself. Commit, then Render → Manual Deploy → Deploy latest commit. No environment variable, secret value or Google authorized origin needs changing for this feature. The database migration is already applied to Aiven; do not reset tables or recreate accounts. Full tipped-docker-release.zip also includes the feature.
+The prepared PROJ/TIPPED-DIRECT-UPDATE folder contains 11 changed files under backend, frontend and docs. Upload those THREE child folders together at the GitHub repository root, commit and manually deploy latest commit on Render. Do not upload the parent folder. No environment changes or database migration is required. The full release ZIP is also refreshed. After Render is Live, hard-refresh the site and directly sign in with an external Gmail in an Incognito window. No approval step should appear.
 
-Changed runtime files: backend/base/{models,access_policy,external_access,google_auth,authentication,api,permissions,urls,views}.py; backend/base/migrations/0008_external_access.py; frontend/src/components/{ExternalInvitations,GoogleSignIn}.jsx; frontend/src/pages/{Administration,Login,Register,Profile}.jsx. Supporting docs, context and release packaging were updated. Existing pages/components/context organization is retained.
+Runtime files changed: backend/base/google_auth.py, access_policy.py, authentication.py, external_access.py; frontend/src/components/GoogleSignIn.jsx; frontend/src/pages/Administration.jsx, Login.jsx, Register.jsx. Docs and project context updated. Existing report/claim permissions and pages/components/context organization are retained.

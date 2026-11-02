@@ -304,8 +304,9 @@ body { font-weight: 400; line-height: 1.65; }
 .tipped-site-header a[aria-label="TIPPED home"] > span:last-child > span { color: var(--app-muted); }
 .site-nav-link, .site-auth-link, .tipped-site-header .notification-nav { color: var(--app-ink); }
 .site-nav-link:hover, .site-nav-link.is-active { color: var(--app-ink); background: white; }
-.site-auth-link { border-color: #c9cdd4; }
-.site-auth-link:hover { background: white; border-color: var(--color-brand-500); }
+.site-auth-link { border-color: #c9cdd4; transition: background-color .15s, border-color .15s, box-shadow .15s; }
+.site-auth-link:is(:hover,:focus-visible) { background: var(--color-brand-100); border-color: var(--color-brand-500); box-shadow: 0 0 0 2px var(--color-brand-100); }
+.site-auth-link:is(.is-active,:last-child):is(:hover,:focus-visible) { background: var(--color-brand-700); border-color: var(--color-brand-500); }
 .tipped-site-header #main-navigation, .tipped-site-header #main-navigation > div:last-child { border-color: var(--app-line); }
 .tipped-site-header #main-navigation summary, .tipped-site-header > div > button { color: var(--app-ink); border-color: #b9bec6; background: white; }
 .tipped-site-header :is(a,button,summary):focus-visible { outline-color: var(--color-brand-500); }
@@ -328,3 +329,15 @@ body { font-weight: 400; line-height: 1.65; }
 
 /* User-entered titles/names may contain long words without spaces. */
 .report-card h3, .activity-row h2, .staff-queue-button h2, .configuration-record > span { min-width: 0; overflow-wrap: anywhere; }
+
+/* Account form hover/focus feedback; preserve disabled and invalid states. */
+.account-form .field { transition: border-color .15s, background-color .15s, box-shadow .15s; }
+.account-form .field:hover:not(:disabled):not(:focus):not([aria-invalid="true"]) { border-color: var(--color-brand-500); background: var(--color-brand-50); }
+.account-form .field:focus { box-shadow: 0 0 0 3px var(--color-brand-100); }
+.account-form .field[aria-invalid="true"] { border-color: var(--color-red-700); }
+.tipped-product .account-form .btn-primary:is(:hover,:focus-visible):not(:disabled) { background: var(--color-brand-700); border-color: var(--color-brand-500); box-shadow: 0 0 0 3px var(--color-brand-100); }
+.account-form .relative > button:is(:hover,:focus-visible):not(:disabled) { background: var(--color-brand-100); color: var(--app-ink); }
+.account-form a:is(:hover,:focus-visible) { color: var(--color-brand-800); background: var(--color-brand-50); }
+@media (prefers-reduced-motion: reduce) {
+  .site-auth-link, .account-form .field, .tipped-product .account-form :is(.btn-primary,.btn-secondary) { transition: none; }
+}

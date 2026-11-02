@@ -7,7 +7,6 @@ import PageHeading from '../components/common/PageHeading'
 import Feedback from '../components/common/Feedback'
 import Pagination from '../components/common/Pagination'
 import Loading from '../components/Loading'
-import ExternalInvitations from '../components/ExternalInvitations'
 
 const roleLabels = { superadmin: 'Super Admin', admin: 'Administrator', osa: 'OSA', student: 'Student', guest: 'External user' }
 
@@ -142,7 +141,6 @@ export default function Administration() {
         </div>
       ))}
       {section === 'accounts' && <section>
-        {user.isSuperuser && <div className="mb-8"><ExternalInvitations /></div>}
         <h2 className="text-2xl font-bold">{user.isSuperuser ? 'Accounts & role assignments' : 'Ordinary accounts & identity review'}</h2>
         <form className="my-5 flex gap-3" onSubmit={event => { event.preventDefault(); setQuery(new FormData(event.currentTarget).get('q')); setPage(1) }}><label className="flex-1"><span className="sr-only">Search accounts</span><input className="field" name="q" placeholder="Search username or email" /></label><button className="btn-secondary self-end">Search</button></form>
         <Feedback error={users.error} />

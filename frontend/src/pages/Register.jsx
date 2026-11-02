@@ -13,7 +13,8 @@ const fieldClass = 'field'
 
 export default function Register() {
   const [params] = useSearchParams()
-  const configuration = useApi('/auth/config/')
+  const passwordPreview = import.meta.env.DEV && params.get('preview') === 'password'
+  const configuration = useApi(passwordPreview ? null : '/auth/config/')
   const { register, loading } = useAuth()
   const navigate = useNavigate()
   const [submitting, setSubmitting] = useState(false)
@@ -25,6 +26,10 @@ export default function Register() {
 
   async function handleSubmit(event) {
     event.preventDefault()
+    if (passwordPreview) {
+      setMessage('Design preview only. No authentication request was sent and no account was created.')
+      return
+    }
     if (submitting) return
     const form = event.currentTarget
     const values = new FormData(form)
@@ -70,10 +75,10 @@ export default function Register() {
       <p className="account-side-note">A misplaced essential. A thoughtful finder. Be part of the way back.</p></div><div className="account-form">
         <div className="account-form-note flex items-start gap-3">
           <LuLockKeyhole aria-hidden="true" className="mt-1 h-4 w-4 shrink-0 text-brand-800" />
-          <p id="register-preview-note" className="text-xs leading-6 text-slate-600"><strong className="text-slate-900">Create your account.</strong> {configuration.data?.passwordAuthEnabled ? 'All fields are required. You can add student details later in your profile.' : 'TIP Google accounts can register directly. External Google accounts need Super Admin approval before signing in.'}</p>
+          <p id="register-preview-note" className="text-xs leading-6 text-slate-600"><strong className="text-slate-900">Create your account.</strong> {passwordPreview ? 'Local design preview. Use sample values only; this form does not authenticate.' : configuration.data?.passwordAuthEnabled ? 'All fields are required. You can add student details later in your profile.' : 'Continue with Google to get started.'}</p>
         </div>
-        <GoogleSignIn configuration={configuration} next={next} />
-        {configuration.data?.passwordAuthEnabled && <form onSubmit={handleSubmit} onInput={() => { setError(null); setMessage('') }} aria-describedby="register-preview-note" className="space-y-5" aria-busy={submitting}><fieldset disabled={submitting} className="min-w-0 space-y-5">
+        {!passwordPreview && <GoogleSignIn configuration={configuration} next={next} />}
+        {(passwordPreview || configuration.data?.passwordAuthEnabled) && <form onSubmit={handleSubmit} onInput={() => { setError(null); setMessage('') }} aria-describedby="register-preview-note" className="space-y-5" aria-busy={submitting}><fieldset disabled={submitting} className="min-w-0 space-y-5">
           <div className="grid gap-5 sm:grid-cols-2">
             <div><label htmlFor="register-name" className="block text-sm font-semibold text-slate-700">Full name *</label><input id="register-name" name="fullName" autoComplete="name" required maxLength={150} aria-invalid={error?.field === 'fullName' || undefined} aria-describedby={error?.field === 'fullName' ? 'register-error' : undefined} placeholder="Your full name" className={fieldClass} /></div>
             <div><label htmlFor="register-username" className="block text-sm font-semibold text-slate-700">Username *</label><input id="register-username" name="username" autoComplete="username" autoCapitalize="none" spellCheck={false} required maxLength={150} aria-invalid={error?.field === 'username' || undefined} aria-describedby={error?.field === 'username' ? 'register-error' : undefined} placeholder="Choose a username" className={fieldClass} /></div>
@@ -86,7 +91,7 @@ export default function Register() {
           {message && <p role="status" className="rounded-xl border border-brand-200 bg-brand-50 p-4 text-sm leading-7 text-slate-700">{message}</p>}
           <button type="submit" disabled={submitting} aria-busy={submitting} className="btn-primary w-full">{submitting ? <Loading inline label="Creating account..." /> : <><LuUserPlus aria-hidden="true" />Create Account</>}</button>
         </fieldset></form>}
-        <p className="mt-6 text-center text-sm leading-7 text-slate-600">Already registered? <Link to={`/login?${new URLSearchParams({ next })}`} className="font-semibold text-brand-800 underline underline-offset-4">Sign In</Link></p>
+        <p className="mt-6 text-center text-sm leading-7 text-slate-600">Already registered? <Link to={`/login?${new URLSearchParams({ next, ...(passwordPreview ? { preview: 'password' } : {}) })}`} className="font-semibold text-brand-800 underline underline-offset-4">Sign In</Link></p>
         {reporting && <div className="mt-5 text-center"><Link to={next} className="text-xs font-semibold text-slate-600 underline underline-offset-4">Back to reporting steps</Link></div>}
       </div>
       </div>

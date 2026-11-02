@@ -30,7 +30,6 @@ export default function HeroSection({ query, onQueryChange, onSearch, onReportLo
               <figcaption className="home-campus-caption"><span>CONNECTED BY CAMPUS.</span><strong>A familiar place.<br /> A helping hand.</strong></figcaption>
             </figure>
             <div className="home-trust-note"><LuShieldCheck aria-hidden="true" /><p><strong>Thoughtful returns, guided by staff.</strong><span>Ownership checks and physical handover are handled separately.</span></p></div>
-            <a className="home-photo-credit" href="https://commons.wikimedia.org/wiki/File:Technological_Institute_of_the_Philippines_Manila.jpg" target="_blank" rel="noreferrer">Photo: JamBreboneria / Wikimedia · CC BY-SA 4.0 · cropped</a>
           </div>
         </div>
       </div>
